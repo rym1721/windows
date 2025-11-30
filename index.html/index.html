@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Retro WMP Style Player</title>
+<style>
+  :root{
+    --pink:#ff2ba5;
+    --light:#ffcee8;
+    --frame:#b10063;
+  }
+  body{
+    background:
+    url("https://i.pinimg.com/736x/2f/7d/0b/2f7d0b8b4846e882aa0e08bccbdf49d6.jpg")
+    center/cover no-repeat;
+
+    margin:0;
+    display:flex;
+    justify-content:center;
+    padding:18px;
+    font-family:Arial,Helvetica,sans-serif;
+  }
+  .window{
+  width:360px;
+  max-width:95vw;
+  border:4px solid var(--frame);
+  border-radius:6px;
+
+  /* КАРТИНКА ДОЛЖНА БЫТЬ ПОСЛЕДНЕЙ — тогда она НИЖЕ всех слоёв */
+  background:
+    url("https://i.pinimg.com/736x/2f/7d/0b/2f7d0b8b4846e882aa0e08bccbdf49d6.jpg")
+    center/cover no-repeat;
+
+
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
+  overflow:hidden;
+}
+
+  .titlebar{
+    background:linear-gradient(#ff80c6,#ff006d);
+    color:#ffffff;
+    padding:8px 10px;
+    font-weight:700;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .menu{
+    background:#ffc4e5;
+    padding:6px 10px;
+    font-size:14px;
+    color:#000;
+    display:flex;
+    gap:12px;
+  }
+  .screen{
+    background:#000;
+    width:100%;
+    height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .status{
+    background:var(--light);
+    padding:6px 10px;
+    color:#91005e;
+    font-size:15px;
+  }
+  .video-seek{
+    background:#fc92ca;
+    padding:6px;
+  }
+  .video-seek input[type=range]{width:100%}
+  .controls{
+    background:linear-gradient(#ff80b6,#ff3a96);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px;
+  }
+  .left-cluster{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .big-play{
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 30%,#fff,#f3d6e6);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:inset 0 2px 0 rgba(0,0,0,0.1);
+    cursor:pointer;
+  }
+  .big-play:active{transform:scale(.98)}
+  .big-play svg{width:26px;height:26px}
+  .small-btn{
+    width:26px;
+    height:26px;
+    border-radius:8px;
+    background:linear-gradient(#fff,#f0cde0);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:inset 0 1px 0 rgba(0,0,0,.08);
+    cursor:pointer;
+  } 
+  .small-btn svg{width:16px;height:16px}
+  .center-controls{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .volume{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-left:14px;
+  }
+  .volume input[type=range]{width:90px}
+  @media (max-width:420px){
+    .screen{height:180px}
+    .big-play{width:48px;height:48px}
+  }
+</style>
+</head>
+<body>
+  <div class="window" role="application">
+    <div class="titlebar"><span>Windows Media Player</span><span>— ◻ ✕</span></div>
+    <div class="menu">File View Play Tools Help</div>
+
+    <div class="screen">
+      <video id="player" preload="metadata" src="video_2025-11-30_19-34-11.mp4"></video>
+    </div>
+
+    <div class="status" id="status">Ready</div>
+
+    <div class="video-seek">
+      <input id="seek" type="range" min="0" max="100" value="0" />
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:#4a0030;margin-top:4px">
+        <span id="curTime">0:00</span><span id="durTime">0:00</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="left-cluster">
+        <div class="big-play" id="btnPlay" title="Play">
+          <svg viewBox="0 0 24 24" fill="#4a0030"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="small-btn" id="btnPause" title="Pause">
+          <svg viewBox="0 0 24 24" fill="#4a0030"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </div>
+        <div class="small-btn" id="btnStop" title="Stop">
+          <svg viewBox="0 0 24 24" fill="#4a0030"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+        </div>
+        <div class="small-btn" id="btnRew" title="Rewind">
+          <svg viewBox="0 0 24 24" fill="#4a0030"><path d="M11 12L20 18V6zM4 6v12l7-6z"/></svg>
+        </div>
+        <div class="small-btn" id="btnFwd" title="Forward">
+          <svg viewBox="0 0 24 24" fill="#4a0030"><path d="M4 6v12l7-6  -7-6zM13 6v12l7-6z"/></svg>
+        </div>
+      </div>
+
+      <div class="center-controls">
+        <div class="volume">
+          <div style="width:22px;height:22px;display:flex;align-items:center;justify-content:center">🔊</div>
+          <input id="volume" type="range" min="0" max="1" step="0.01" value="1" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Элементы
+const v = document.getElementById('player');
+const seek = document.getElementById('seek');
+const volume = document.getElementById('volume');
+const btnPlay = document.getElementById('btnPlay');
+const btnPause = document.getElementById('btnPause');
+const btnStop = document.getElementById('btnStop');
+const btnRew = document.getElementById('btnRew');
+const btnFwd = document.getElementById('btnFwd');
+const status = document.getElementById('status');
+const curTime = document.getElementById('curTime');
+const durTime = document.getElementById('durTime');
+
+v.addEventListener('loadedmetadata', ()=>{
+  updateTimeDisplay();
+});
+
+v.addEventListener('timeupdate', ()=>{
+  if (v.duration){
+    seek.value = (v.currentTime / v.duration) * 100;
+    updateTimeDisplay();
+  }
+});
+
+let isSeeking = false;
+seek.addEventListener('input', ()=>{
+  isSeeking = true;
+  if (v.duration) v.currentTime = (seek.value / 100) * v.duration;
+});
+seek.addEventListener('change', ()=>{ isSeeking = false; });
+
+btnPlay.addEventListener('click', ()=>{ v.play(); status.textContent='Playing'; });
+btnPause.addEventListener('click', ()=>{ v.pause(); status.textContent='Paused'; });
+btnStop.addEventListener('click', ()=>{ v.pause(); v.currentTime=0; status.textContent='Ready'; });
+btnRew.addEventListener('click', ()=>{ v.currentTime = Math.max(0, v.currentTime - 5); });
+btnFwd.addEventListener('click', ()=>{ if (v.duration) v.currentTime = Math.min(v.duration, v.currentTime + 5); });
+
+volume.addEventListener('input', ()=>{ v.volume = volume.value; });
+
+function formatTime(s){
+  if (!isFinite(s)) return '0:00';
+  const m = Math.floor(s/60);
+  const sec = Math.floor(s%60).toString().padStart(2,'0');
+  return `${m}:${sec}`;
+}
+function updateTimeDisplay(){
+  curTime.textContent = formatTime(v.currentTime);
+  durTime.textContent = formatTime(v.duration);
+}
+
+v.addEventListener('click', ()=>{
+  if (v.paused) { v.play(); status.textContent='Playing'; } else { v.pause(); status.textContent='Paused'; }
+});
+</script>
+</body>
+</html>
